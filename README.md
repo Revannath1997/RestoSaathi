@@ -1,0 +1,2 @@
+# RestoSaathi
+Restaurant management platform
