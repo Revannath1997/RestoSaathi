@@ -1,0 +1,296 @@
+# RestoSaathi Dashboard - Implementation Guide
+
+## Project Setup
+
+### 1. Create Next.js Project
+```bash
+npx create-next-app@latest resto-saathi --typescript --tailwind --eslint
+cd resto-saathi
+```
+
+### 2. Install Dependencies
+```bash
+npm install lucide-react
+```
+
+### 3. Tailwind CSS Configuration
+Ensure your `tailwind.config.js` includes:
+```javascript
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'navy': '#0B2545',
+        'resto-orange': '#FF6B00',
+        'dark-slate': '#1E293B',
+      },
+    },
+  },
+  plugins: [],
+}
+```
+
+### 4. File Structure
+```
+resto-saathi/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx              (Dashboard page)
+│   └── globals.css           (Tailwind directives)
+├── components/
+│   ├── RestoDashboard.jsx    (Main dashboard component)
+│   ├── Sidebar.jsx           (Optional: Extract sidebar)
+│   ├── Header.jsx            (Optional: Extract header)
+│   └── KPICard.jsx           (Optional: Extract KPI card)
+└── tailwind.config.js
+```
+
+## Component Integration
+
+### Option 1: Direct Integration (Simple)
+In your `app/page.tsx`:
+```typescript
+import RestoDashboard from '@/components/RestoDashboard';
+
+export default function Home() {
+  return <RestoDashboard />;
+}
+```
+
+### Option 2: Modular Approach (Recommended for production)
+Break down the dashboard into smaller components:
+
+```
+components/
+├── Dashboard/
+│   ├── index.jsx
+│   ├── Sidebar.jsx
+│   ├── Header.jsx
+│   ├── KPIGrid.jsx
+│   ├── RecentOrders.jsx
+│   └── types.ts
+```
+
+## Key Features Implemented
+
+### Sidebar Features
+- ✅ Collapsible sidebar with toggle button
+- ✅ All 10 modules from PRD with icon integration
+- ✅ Navy Blue (#0B2545) background
+- ✅ RestoSaathi logo with tagline
+- ✅ Active state highlighting on Central Dashboard (module 10)
+- ✅ Hover effects and smooth transitions
+- ✅ Responsive design
+
+### Top Bar Features
+- ✅ Branch/Outlet location dropdown
+- ✅ Online/Offline status badge with toggle
+- ✅ "+ New KOT" prominent action button in Vibrant Orange
+- ✅ Responsive layout
+- ✅ Interactive status switching
+
+### Dashboard KPIs
+- ✅ 4 key metric cards:
+  1. Today's Sales (with trend)
+  2. Active Tables (with availability)
+  3. Pending KOTs (with urgency indicator)
+  4. Low Stock Alerts (with specific items)
+- ✅ Color-coded backgrounds for each metric
+- ✅ Icons and trend indicators
+- ✅ Responsive grid (1 col mobile, 2 col tablet, 4 col desktop)
+
+### Recent Orders Table
+- ✅ Live order tracking
+- ✅ Status badges (Ready, Preparing, Served)
+- ✅ KOT ID, Table, Items, Amount, Time columns
+- ✅ Hover effects on rows
+- ✅ Status color coding
+- ✅ "View All Orders" navigation link
+- ✅ Responsive horizontal scroll on mobile
+
+## Styling Details
+
+### Color Palette
+```
+Primary Navy: #0B2545
+Action Orange: #FF6B00
+Dark Slate: #1E293B
+Success Green: #22C55E
+Alert Red: #EF4444
+```
+
+### Typography
+- Logo: Bold 20px
+- Tagline: 12px gray-400
+- KPI Titles: Medium 14px
+- KPI Values: Bold 30px
+- Table Headers: Semibold 12px
+- Table Cells: Regular 14px
+
+### Spacing
+- Sidebar padding: 24px (p-6)
+- Header padding: 32px horizontal, 16px vertical
+- Content padding: 32px
+- Gap between KPIs: 24px (gap-6)
+
+## State Management
+
+The component uses React hooks:
+- `sidebarOpen`: Boolean state for sidebar toggle
+- `isOnline`: Boolean state for online/offline status
+- `selectedBranch`: String state for branch selection
+
+### To integrate with Redux/Context (recommended for production):
+```typescript
+import { useDispatch, useSelector } from 'react-redux';
+
+const sidebarOpen = useSelector(state => state.ui.sidebarOpen);
+const dispatch = useDispatch();
+```
+
+## API Integration Points
+
+### To connect with backend APIs:
+
+1. **KPI Data Fetching**
+```typescript
+useEffect(() => {
+  fetch('/api/v1/dashboard/kpis')
+    .then(res => res.json())
+    .then(data => setKpis(data));
+}, []);
+```
+
+2. **Recent Orders**
+```typescript
+useEffect(() => {
+  fetch('/api/v1/orders/recent')
+    .then(res => res.json())
+    .then(data => setRecentOrders(data));
+}, []);
+```
+
+3. **Voice KOT Integration** (Module 7)
+```typescript
+const handleNewKOT = () => {
+  // Navigate to Voice KOT module
+  router.push('/modules/voice-kot');
+};
+```
+
+## Responsive Breakpoints
+
+- **Mobile (< 768px)**: 
+  - Sidebar collapses to icon-only
+  - KPI cards stack vertically
+  - Table scrolls horizontally
+  
+- **Tablet (768px - 1024px)**:
+  - Sidebar can toggle
+  - KPI cards show 2 per row
+  - Table shows all columns
+  
+- **Desktop (> 1024px)**:
+  - Sidebar always visible
+  - KPI cards show 4 per row
+  - Full table display with optimal spacing
+
+## Accessibility Features
+
+- ✅ Semantic HTML structure
+- ✅ Title attributes on all buttons
+- ✅ Color contrast meets WCAG standards
+- ✅ Keyboard navigation support
+- ✅ Icon + text labels for important actions
+- ✅ Loading states ready for implementation
+
+## Performance Optimization
+
+### For production:
+```typescript
+import dynamic from 'next/dynamic';
+
+const RestoDashboard = dynamic(() => import('@/components/RestoDashboard'), {
+  loading: () => <DashboardSkeleton />,
+});
+```
+
+## Future Enhancements
+
+1. **Real-time Updates**: WebSocket integration for live KPI updates
+2. **Module Navigation**: Router integration for all 10 modules
+3. **Dark Mode**: Theme toggle with context
+4. **Notifications**: Toast alerts for urgent orders
+5. **PDF Export**: Dashboard snapshot export
+6. **Multi-branch**: Real-time switching between branch locations
+7. **Mobile App**: React Native version using same logic
+
+## Testing
+
+### Unit Tests (Jest)
+```typescript
+describe('RestoDashboard', () => {
+  it('should toggle sidebar', () => {
+    // Test sidebar toggle functionality
+  });
+  
+  it('should display KPI cards', () => {
+    // Test KPI card rendering
+  });
+});
+```
+
+### E2E Tests (Cypress)
+```javascript
+describe('Dashboard Flow', () => {
+  it('should create new KOT', () => {
+    cy.visit('/');
+    cy.contains('New KOT').click();
+    // Voice KOT module opens
+  });
+});
+```
+
+## Deployment
+
+### Vercel (Recommended)
+```bash
+npm run build
+vercel deploy
+```
+
+### Docker
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+## Troubleshooting
+
+### Icons not showing?
+- Ensure `lucide-react` is installed: `npm install lucide-react`
+
+### Tailwind styles not applying?
+- Check `content` paths in `tailwind.config.js`
+- Run `npm run build` to rebuild
+
+### Sidebar toggle not working?
+- Ensure `'use client'` directive is at top of component
+- Check React version compatibility
+
+## Support & Documentation
+
+- **Lucide Icons**: https://lucide.dev
+- **Tailwind CSS**: https://tailwindcss.com/docs
+- **Next.js**: https://nextjs.org/docs
+- **RestoSaathi Docs**: See PRD and Architecture files
