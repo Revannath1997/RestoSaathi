@@ -1,0 +1,65 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // RestoSaathi Brand Colors
+        'resto': {
+          navy: '#0B2545',
+          orange: '#FF6B00',
+          slate: '#1E293B',
+          success: '#22C55E',
+          danger: '#EF4444',
+        },
+        // Extended palette
+        'status': {
+          available: '#22C55E',
+          reserved: '#EF4444',
+          maintenance: '#F59E0B',
+          unknown: '#6B7280',
+        },
+      },
+      backgroundColor: {
+        'sidebar': '#0B2545',
+        'primary-action': '#FF6B00',
+      },
+      textColor: {
+        'brand': '#0B2545',
+        'action': '#FF6B00',
+      },
+      borderColor: {
+        'sidebar': '#003d82',
+      },
+      boxShadow: {
+        'sm-orange': '0 2px 4px rgba(255, 107, 0, 0.1)',
+        'md-orange': '0 4px 8px rgba(255, 107, 0, 0.15)',
+        'lg-orange': '0 10px 20px rgba(255, 107, 0, 0.2)',
+      },
+      animation: {
+        'pulse-soft': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      spacing: {
+        'sidebar-collapsed': '5rem',
+        'sidebar-expanded': '16rem',
+        'header-height': '4rem',
+      },
+      fontSize: {
+        'logo': '1.25rem',
+        'tagline': '0.75rem',
+      },
+      borderRadius: {
+        'card': '0.75rem',
+        'button': '0.5rem',
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+  ],
+};

@@ -1,0 +1,98 @@
+import React from 'react';
+import {
+  Menu,
+  X,
+  ChefHat,
+  BarChart3,
+  MessageSquare,
+  Package,
+  Grid3X3,
+  Calendar,
+  Mic2,
+  Users,
+  MapPin,
+  Home,
+} from 'lucide-react';
+
+export const MODULES = [
+  { id: 1, name: 'CRM Dashboard', icon: Home, color: 'text-blue-500' },
+  { id: 2, name: 'Sales Reports', icon: BarChart3, color: 'text-emerald-500' },
+  { id: 3, name: 'WhatsApp Billing', icon: MessageSquare, color: 'text-green-500' },
+  { id: 4, name: 'Inventory Control', icon: Package, color: 'text-amber-500' },
+  { id: 5, name: 'Table Manager', icon: Grid3X3, color: 'text-purple-500' },
+  { id: 6, name: 'Event Scheduler', icon: Calendar, color: 'text-pink-500' },
+  { id: 7, name: 'Voice KOT', icon: Mic2, color: 'text-orange-500' },
+  { id: 8, name: 'Staff Roster', icon: Users, color: 'text-indigo-500' },
+  { id: 9, name: 'Multi-Location', icon: MapPin, color: 'text-red-500' },
+  { id: 10, name: 'Central Dashboard', icon: ChefHat, color: 'text-yellow-500' },
+];
+
+interface SidebarProps {
+  isOpen: boolean;
+  onToggle: (state: boolean) => void;
+  activeModule?: number;
+  onModuleChange?: (moduleId: number) => void;
+}
+
+export function Sidebar({
+  isOpen,
+  onToggle,
+  activeModule = 10,
+  onModuleChange,
+}: SidebarProps) {
+  return (
+    <aside
+      className={`${
+        isOpen ? 'w-64' : 'w-20'
+      } bg-[#0B2545] text-white transition-all duration-300 flex flex-col shadow-lg overflow-y-auto`}
+    >
+      {/* Logo & Tagline */}
+      <div className="p-6 border-b border-blue-900">
+        <div className="flex items-center gap-3 mb-3">
+          <ChefHat className="w-8 h-8 text-[#FF6B00] flex-shrink-0" />
+          {isOpen && (
+            <div>
+              <h1 className="text-xl font-bold text-white">RestoSaathi</h1>
+              <p className="text-xs text-gray-400">Billing. Operations. Growth.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        {MODULES.map((module) => {
+          const IconComponent = module.icon;
+          const isActive = module.id === activeModule;
+
+          return (
+            <button
+              key={module.id}
+              onClick={() => onModuleChange?.(module.id)}
+              className={`w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? 'bg-[#FF6B00] text-white shadow-lg'
+                  : 'hover:bg-blue-800 text-gray-200 hover:text-white'
+              }`}
+              title={module.name}
+            >
+              <IconComponent className="w-5 h-5 flex-shrink-0" />
+              {isOpen && <span className="text-sm font-medium truncate">{module.name}</span>}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Sidebar Toggle */}
+      <button
+        onClick={() => onToggle(!isOpen)}
+        className="mx-4 mb-6 w-12 h-12 flex items-center justify-center bg-blue-800 hover:bg-blue-700 rounded-lg transition-colors flex-shrink-0"
+        title={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+      >
+        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+    </aside>
+  );
+}
+
+export default Sidebar;

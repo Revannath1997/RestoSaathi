@@ -1,0 +1,460 @@
+# RestoSaathi Dashboard - Quick Start Guide
+
+## 🚀 5-Minute Setup
+
+### 1. Create Next.js Project
+```bash
+npx create-next-app@latest resto-saathi --typescript --tailwind --eslint
+cd resto-saathi
+```
+
+### 2. Install Required Dependencies
+```bash
+npm install lucide-react
+npm install -D @tailwindcss/forms @tailwindcss/typography
+```
+
+### 3. Copy Files to Your Project
+
+```
+your-project/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx                    # Import RestoDashboard here
+│   ├── globals.css                 # Copy content from globals.css
+│   └── favicon.ico
+├── components/
+│   ├── RestoDashboard.jsx          # Copy resto-dashboard.jsx
+│   ├── Sidebar.jsx                 # Copy components-Sidebar.jsx
+│   ├── Header.jsx                  # Copy components-Header.jsx
+│   ├── KPICard.jsx                 # Copy components-KPICard.jsx
+│   └── RecentOrders.jsx            # Copy components-RecentOrders.jsx
+├── tailwind.config.js              # Copy from provided file
+├── package.json
+└── README.md
+```
+
+### 4. Update `app/page.tsx`
+```typescript
+import RestoDashboard from '@/components/RestoDashboard';
+
+export default function Home() {
+  return <RestoDashboard />;
+}
+```
+
+### 5. Update `app/layout.tsx`
+```typescript
+import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: 'RestoSaathi - Restaurant Management',
+  description: 'Billing. Operations. Growth.',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body suppressHydrationWarning>{children}</body>
+    </html>
+  );
+}
+```
+
+### 6. Run Development Server
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000` in your browser.
+
+---
+
+## 📁 File Structure Explanation
+
+### Core Components
+
+#### `RestoDashboard.jsx`
+**Main container component**
+- Manages overall state (sidebar, header, KPIs, orders)
+- Orchestrates all sub-components
+- Handles event callbacks and navigation
+
+**Key Props:** None (standalone)
+**State:**
+- `sidebarOpen`: boolean
+- `activeModule`: number (1-10)
+- `isOnline`: boolean
+- `selectedBranch`: string
+
+---
+
+#### `Sidebar.jsx`
+**Left navigation sidebar**
+- Displays all 10 modules
+- Collapsible/expandable toggle
+- Active module highlighting
+
+**Key Props:**
+```typescript
+interface SidebarProps {
+  isOpen: boolean;
+  onToggle: (state: boolean) => void;
+  activeModule?: number;
+  onModuleChange?: (moduleId: number) => void;
+}
+```
+
+**Features:**
+- ✅ Logo with tagline
+- ✅ 10 module navigation links
+- ✅ Active state styling
+- ✅ Smooth collapse/expand animation
+- ✅ Hover effects
+
+---
+
+#### `Header.jsx`
+**Top navigation bar**
+- Branch/outlet selector
+- Online/offline status toggle
+- New KOT action button
+
+**Key Props:**
+```typescript
+interface HeaderProps {
+  selectedBranch?: string;
+  isOnline?: boolean;
+  onBranchChange?: (branch: string) => void;
+  onStatusChange?: (online: boolean) => void;
+  onNewKOT?: () => void;
+  branches?: string[];
+}
+```
+
+**Features:**
+- ✅ Dropdown branch selector
+- ✅ Real-time status indicator
+- ✅ Prominent CTA button (Vibrant Orange)
+- ✅ Offline warning banner
+
+---
+
+#### `KPICard.jsx`
+**Dashboard metric cards**
+- Displays key performance indicators
+- Color-coded by metric type
+- Trend indicators (up/down)
+
+**Key Props:**
+```typescript
+interface KPICardProps {
+  title: string;
+  value: string | number;
+  change: string;
+  isPositive: boolean;
+  icon: LucideIcon;
+  bgColor?: string;
+  borderColor?: string;
+  onClick?: () => void;
+}
+```
+
+**Default Cards:**
+1. **Today's Sales** - Revenue metric
+2. **Active Tables** - Occupancy indicator
+3. **Pending KOTs** - Order queue
+4. **Low Stock Alerts** - Inventory warnings
+
+---
+
+#### `RecentOrders.jsx`
+**Order tracking table**
+- Live order list with statuses
+- Interactive row selection
+- Status badges (Ready, Preparing, Served)
+
+**Key Props:**
+```typescript
+interface RecentOrdersProps {
+  orders?: Order[];
+  isLoading?: boolean;
+  onViewAll?: () => void;
+  onOrderClick?: (orderId: string) => void;
+}
+```
+
+**Features:**
+- ✅ Real-time status updates
+- ✅ Sortable columns (optional)
+- ✅ Horizontal scroll on mobile
+- ✅ Empty state handling
+- ✅ Loading indicator
+
+---
+
+## 🎨 Customization Guide
+
+### Change Brand Colors
+Edit `tailwind.config.js`:
+```javascript
+extend: {
+  colors: {
+    'resto': {
+      navy: '#0B2545',      // Change here
+      orange: '#FF6B00',    // Change here
+      slate: '#1E293B',
+    },
+  },
+}
+```
+
+### Update Module List
+Edit `Sidebar.jsx` → `MODULES` array:
+```typescript
+const MODULES = [
+  { id: 1, name: 'Your Module', icon: Home, color: 'text-blue-500' },
+  // Add more...
+];
+```
+
+### Modify KPI Cards
+Edit `RestoDashboard.jsx` → `kpiCards` array:
+```typescript
+const kpiCards = [
+  {
+    title: "Your Metric",
+    value: '100',
+    change: '+5%',
+    isPositive: true,
+    // ... more props
+  },
+];
+```
+
+### Change Sample Data
+All sample data is hardcoded in the refactored components. Update:
+- `RestoDashboard.jsx` for KPI data
+- `RecentOrders.jsx` for order data
+- `Header.jsx` for branch list
+
+---
+
+## 🔌 API Integration
+
+### Fetch KPI Data
+Replace sample data in `RestoDashboard.jsx`:
+```typescript
+useEffect(() => {
+  const fetchKPIs = async () => {
+    const res = await fetch('/api/v1/dashboard/kpis');
+    const data = await res.json();
+    setKpis(data);
+  };
+  fetchKPIs();
+}, []);
+```
+
+### Fetch Recent Orders
+```typescript
+useEffect(() => {
+  const fetchOrders = async () => {
+    setIsLoadingOrders(true);
+    const res = await fetch('/api/v1/orders/recent?limit=5');
+    const data = await res.json();
+    setRecentOrders(data);
+    setIsLoadingOrders(false);
+  };
+  fetchOrders();
+}, []);
+```
+
+### Handle New KOT
+```typescript
+const handleNewKOT = async () => {
+  // Navigate to Voice KOT module (Module 7)
+  setActiveModule(7);
+  // Or use Next.js router:
+  // router.push('/modules/voice-kot');
+};
+```
+
+---
+
+## 🎯 Module Navigation
+
+To enable navigation between modules, update `handleModuleChange` in `RestoDashboard.jsx`:
+
+```typescript
+import { useRouter } from 'next/navigation';
+
+const router = useRouter();
+
+const handleModuleChange = useCallback((moduleId: number) => {
+  setActiveModule(moduleId);
+  const moduleRoutes = {
+    1: '/crm',
+    2: '/reports',
+    3: '/billing',
+    4: '/inventory',
+    5: '/tables',
+    6: '/events',
+    7: '/voice-kot',
+    8: '/staff',
+    9: '/locations',
+    10: '/dashboard',
+  };
+  router.push(moduleRoutes[moduleId]);
+}, [router]);
+```
+
+---
+
+## 📱 Responsive Design
+
+The dashboard is fully responsive:
+
+| Device | Sidebar | KPIs | Table |
+|--------|---------|------|-------|
+| Mobile (<768px) | Icon-only | 1 column | Horizontal scroll |
+| Tablet (768-1024px) | Toggle | 2 columns | Full width |
+| Desktop (>1024px) | Full | 4 columns | Full width |
+
+### Mobile Testing
+```bash
+# In Chrome DevTools: Ctrl+Shift+M (or Cmd+Shift+M on Mac)
+# Or run:
+npm run dev -- --hostname 0.0.0.0
+# Then visit your local IP from another device
+```
+
+---
+
+## 🔒 Accessibility
+
+✅ WCAG 2.1 AA Compliant:
+- Semantic HTML structure
+- Color contrast ratios ≥ 4.5:1
+- Keyboard navigation support
+- ARIA labels where needed
+- Focus indicators visible
+
+Test accessibility:
+```bash
+npm install --save-dev @axe-core/react
+# Add axe to development
+```
+
+---
+
+## 🚀 Performance Tips
+
+### Code Splitting
+```typescript
+import dynamic from 'next/dynamic';
+
+const RecentOrders = dynamic(
+  () => import('@/components/RecentOrders'),
+  { loading: () => <p>Loading orders...</p> }
+);
+```
+
+### Image Optimization
+```typescript
+import Image from 'next/image';
+
+// Use Next.js Image instead of <img>
+<Image src="/logo.png" alt="Logo" width={32} height={32} />
+```
+
+### Caching Strategy
+```typescript
+// Cache API responses
+const res = await fetch('/api/v1/dashboard/kpis', {
+  next: { revalidate: 60 } // Revalidate every 60 seconds
+});
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Icons not rendering?
+```bash
+npm install lucide-react@latest
+# Clear cache and restart dev server
+rm -rf .next && npm run dev
+```
+
+### Tailwind styles not applying?
+```bash
+# Ensure content paths are correct in tailwind.config.js
+# Then rebuild:
+npm run build
+```
+
+### Sidebar toggle not working?
+- Ensure `'use client'` directive is at top of component
+- Check React version: `npm list react`
+
+### Build errors?
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+---
+
+## 📚 Further Resources
+
+### Documentation
+- [Next.js Docs](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Lucide Icons](https://lucide.dev)
+- [React Docs](https://react.dev)
+
+### RestoSaathi Docs
+- `RestoSaathi_PRD.txt` - Product requirements
+- `RestoSaathi_Architecture.txt` - Tech stack & DB schema
+- `RestoSaathi_APIs.txt` - API endpoints
+- `RestoSaathi_DesignSystem.txt` - UI/UX guidelines
+
+### Example Implementations
+- **Dark Mode**: Add `dark:` prefix to Tailwind classes
+- **Multi-language**: Use `next-i18next`
+- **State Management**: Integrate Redux or Zustand
+- **Real-time Updates**: Add WebSocket or Firebase listeners
+
+---
+
+## 🤝 Contributing
+
+When extending the dashboard:
+
+1. **Create component files** in `/components`
+2. **Follow naming convention**: `ComponentName.jsx`
+3. **Add TypeScript interfaces** for props
+4. **Include JSDoc comments** for complex logic
+5. **Test on multiple devices** (mobile, tablet, desktop)
+6. **Verify accessibility** with axe DevTools
+
+---
+
+## 📞 Support
+
+For issues or questions:
+1. Check troubleshooting section above
+2. Review RestoSaathi documentation files
+3. Check browser console for errors
+4. Test in a fresh Next.js project
+
+---
+
+**Happy coding! 🎉**
